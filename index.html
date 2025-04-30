@@ -1,22 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Multiplication Worksheet</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-</head>
-<body>
-  <h1>Multiplication Worksheet</h1>
-  <input id="childName" placeholder="Name">
-  <input id="childAge" placeholder="Age">
-  <input id="schoolName" placeholder="School">
-  <input id="todayDate" placeholder="Date">
-  <div id="worksheetPreview" style="margin-top:20px;">4 x 2 = ______</div>
-  <button id="downloadBtn">Download PDF</button>
-
-  <script>
-  
+<script>
   const generateBtn = document.getElementById('generateBtn');
   const checkBtn = document.getElementById('checkBtn');
   const preview = document.getElementById('worksheetPreview');
@@ -113,22 +95,23 @@
   }
 
   resetTimer();
- 
-    const downloadBtn = document.getElementById('downloadBtn');
-    const preview = document.getElementById('worksheetPreview');
+</script>
 
+// JavaScript update to include student info in PDF
     downloadBtn.addEventListener('click', () => {
       const { jsPDF } = window.jspdf;
-      const name = document.getElementById('childName')?.value || '';
-      const age = document.getElementById('childAge')?.value || '';
-      const date = document.getElementById('todayDate')?.value || '';
-      const school = document.getElementById('schoolName')?.value || '';
+      const name = document.getElementById('childName').value || '';
+      const age = document.getElementById('childAge').value || '';
+      const date = document.getElementById('todayDate').value || '';
+      const school = document.getElementById('schoolName').value || '';
 
       html2canvas(preview).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'pt', 'a4');
         const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
 
+        // Add student information and title at top
         pdf.setFontSize(16);
         pdf.setFont(undefined, 'bold');
         pdf.text("📚 Multiplication Worksheet", 40, 40);
@@ -164,7 +147,3 @@
         pdf.addImage(imgData, 'PNG', 40, 140, pageWidth - 80, imgHeight);
         pdf.save('multiplication-worksheet.pdf');
       });
-    });
-  </script>
-</body>
-</html>
