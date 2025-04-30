@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Multiplication Worksheet</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+  <h1>Multiplication Worksheet</h1>
+  <input id="childName" placeholder="Name">
+  <input id="childAge" placeholder="Age">
+  <input id="schoolName" placeholder="School">
+  <input id="todayDate" placeholder="Date">
+  <div id="worksheetPreview" style="margin-top:20px;">4 x 2 = ______</div>
+  <button id="downloadBtn">Download PDF</button>
+
+  <script>
+    const downloadBtn = document.getElementById('downloadBtn');
+    const preview = document.getElementById('worksheetPreview');
+
+    downloadBtn.addEventListener('click', () => {
+      const { jsPDF } = window.jspdf;
+      const name = document.getElementById('childName')?.value || '';
+      const age = document.getElementById('childAge')?.value || '';
+      const date = document.getElementById('todayDate')?.value || '';
+      const school = document.getElementById('schoolName')?.value || '';
+
+      html2canvas(preview).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'pt', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+
+        pdf.setFontSize(16);
+        pdf.setFont(undefined, 'bold');
+        pdf.text("📚 Multiplication Worksheet", 40, 40);
+
+        pdf.setFontSize(12);
+        pdf.setFont(undefined, 'normal');
+        pdf.text(`Name:`, 40, 60);
+        pdf.setFont(undefined, 'bold');
+        pdf.text(`${name}`, 100, 60);
+
+        pdf.setFont(undefined, 'normal');
+        pdf.text(`Age:`, 40, 80);
+        pdf.setFont(undefined, 'bold');
+        pdf.text(`${age}`, 100, 80);
+
+        pdf.setFont(undefined, 'normal');
+        pdf.text(`School:`, 40, 100);
+        pdf.setFont(undefined, 'bold');
+        pdf.text(`${school}`, 100, 100);
+
+        pdf.setFont(undefined, 'normal');
+        pdf.text(`Date:`, 40, 120);
+        pdf.setFont(undefined, 'bold');
+        pdf.text(`${date}`, 100, 120);
+
+        pdf.setDrawColor(150);
+        pdf.line(40, 130, pageWidth - 40, 130);
+
+        const imgProps = pdf.getImageProperties(imgData);
+        const ratio = (pageWidth - 80) / imgProps.width;
+        const imgHeight = imgProps.height * ratio;
+
+        pdf.addImage(imgData, 'PNG', 40, 140, pageWidth - 80, imgHeight);
+        pdf.save('multiplication-worksheet.pdf');
+      });
+    });
+  </script>
+</body>
+</html>
