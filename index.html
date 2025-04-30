@@ -16,6 +16,104 @@
   <button id="downloadBtn">Download PDF</button>
 
   <script>
+  
+  const generateBtn = document.getElementById('generateBtn');
+  const checkBtn = document.getElementById('checkBtn');
+  const preview = document.getElementById('worksheetPreview');
+  const greetingText = document.getElementById('greetingText');
+  const scoreSummary = document.getElementById('scoreSummary');
+
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function generateQuestions(count) {
+    const questions = [];
+    for (let i = 0; i < count; i++) {
+      const a = getRandomInt(2, 12);
+      const b = getRandomInt(2, 12);
+      questions.push({ id: i + 1, a, b, answer: a * b });
+    }
+    return questions;
+  }
+
+  function renderWorksheet(questions, checkMode = false) {
+    preview.innerHTML = '';
+    scoreSummary.textContent = '';
+    let column;
+    for (let i = 0; i < questions.length; i++) {
+      if (i % 20 === 0) {
+        column = document.createElement('div');
+        column.className = 'column';
+        preview.appendChild(column);
+      }
+      const div = document.createElement('div');
+      div.className = 'question';
+      if (checkMode) {
+        div.innerHTML = `${questions[i].id}. ${questions[i].a} x ${questions[i].b} = <input type='number' data-answer='${questions[i].answer}' style='width:60px;'> <span class='feedback'></span>`;
+      } else {
+        div.textContent = `${questions[i].id}. ${questions[i].a} x ${questions[i].b} = _______`;
+      }
+      column.appendChild(div);
+    }
+  }
+
+  generateBtn.addEventListener('click', () => {
+    const name = document.getElementById('childName').value || 'there';
+    greetingText.textContent = `Hi ${name}, let’s play with numbers today!`;
+
+    const count = parseInt(document.getElementById('questionCount').value, 10);
+    const questions = generateQuestions(count);
+    window.generatedQuestions = questions;
+    renderWorksheet(questions);
+    resetTimer();
+  });
+
+  checkBtn.addEventListener('click', () => {
+    renderWorksheet(window.generatedQuestions || [], true);
+
+    setTimeout(() => {
+      const inputs = preview.querySelectorAll('input[type="number"]');
+      let correctCount = 0;
+      inputs.forEach(input => {
+        const correct = parseInt(input.dataset.answer);
+        const userAnswer = parseInt(input.value);
+        const feedback = input.nextElementSibling;
+
+        if (!isNaN(userAnswer)) {
+          if (userAnswer === correct) {
+            feedback.textContent = '✔️';
+            feedback.className = 'feedback correct';
+            correctCount++;
+          } else {
+            feedback.textContent = `❌ (${correct})`;
+            feedback.className = 'feedback wrong';
+          }
+        } else {
+          feedback.textContent = '';
+        }
+      });
+      scoreSummary.textContent = `You got ${correctCount} out of ${inputs.length} correct! 🎉`;
+    }, 100);
+  });
+
+  // Timer logic
+  let timer = 0;
+  let timerInterval = null;
+  const timerDisplay = document.getElementById('timerDisplay');
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    timer = 0;
+    timerDisplay.textContent = '0s';
+    timerInterval = setInterval(() => {
+      timer++;
+      timerDisplay.textContent = timer + 's';
+    }, 1000);
+  }
+
+  resetTimer();
+ 
     const downloadBtn = document.getElementById('downloadBtn');
     const preview = document.getElementById('worksheetPreview');
 
